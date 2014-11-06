@@ -1,4 +1,4 @@
-module Heroploy
+module Deploku
   module Runnable
 
     def run_command(command)

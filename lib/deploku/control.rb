@@ -1,7 +1,7 @@
-module Heroploy
+module Deploku
 
   module Control
-    extend Heroploy::Runnable
+    extend Deploku::Runnable
 
     def self.run(args)
       matching_remotes = remotes & args
@@ -20,7 +20,7 @@ module Heroploy
           exit 1
         else
           args.delete commands[0]
-          Heroploy::Remote.new(remote).send(commands[0], args)
+          Deploku::Remote.new(remote).send(commands[0], args)
         end
       else
         puts "Please choose just one remote out of #{remotes.join(" or ")}"

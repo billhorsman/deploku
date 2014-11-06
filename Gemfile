@@ -1,4 +1,4 @@
 source 'https://rubygems.org'
 
-# Specify your gem's dependencies in heroploy.gemspec
+# Specify your gem's dependencies in deploku.gemspec
 gemspec

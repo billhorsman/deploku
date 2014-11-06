@@ -1,11 +1,11 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'heroploy/version'
+require 'deploku/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "heroploy"
-  spec.version       = Heroploy::VERSION
+  spec.name          = "deploku"
+  spec.version       = Deploku::VERSION
   spec.authors       = ["Bill Horsman"]
   spec.email         = ["bill@logicalcobwebs.com"]
   spec.summary       = %q{Convenient way of deploying to Heroku}

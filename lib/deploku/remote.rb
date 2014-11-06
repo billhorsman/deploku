@@ -1,4 +1,4 @@
-module Heroploy
+module Deploku
 
   class Remote
     include Runnable
