@@ -13,12 +13,24 @@ module Deploku
       @app_name ||= run_command("git remote -v | grep #{remote} | grep push").match(/heroku\.com:(.*)\.git/)[1]
     end
 
+    def remote_commit_exists_locally?
+      test_command("git show #{remote_commit}")
+    end
+
+    def database_configured?
+      test_command("rake db:migrate:status")
+    end
+
     def behind
-      @behind ||= run_command("git rev-list #{remote_commit}.. | wc -l").strip.to_i
+      @behind ||= count_rev_list("#{remote_commit}..")
     end
 
     def ahead
-      @ahead ||= run_command("git rev-list ..#{remote_commit} | wc -l").strip.to_i
+      @ahead ||= count_rev_list("..#{remote_commit}")
+    end
+
+    def count_rev_list(range)
+      run_command("git rev-list #{range}").slice("\n").size
     end
 
     def remote_commit
@@ -27,28 +39,34 @@ module Deploku
 
     def status(args)
       puts "Heroku app #{app_name} is running commit #{remote_commit.slice(0, 7)}"
-      if behind == 0 && ahead == 0
-        puts "It is up to date"
-      else
-        if ahead == 0
-          puts "It is #{behind} commit#{"s" if behind > 1} behind your local #{local_branch} branch"
-        elsif behind == 0
-          puts "It is #{ahead} commit#{"s" if ahead > 1} ahead of your local #{local_branch} branch"
+      if remote_commit_exists_locally?
+        if behind == 0 && ahead == 0
+          puts "It is up to date"
         else
-          puts "It is #{behind} commit#{"s" if behind > 1} behind and #{ahead} commit#{"s" if ahead > 1} ahead of your local #{local_branch} branch"
+          if ahead == 0
+            puts "It is #{behind} commit#{"s" if behind > 1} behind your local #{local_branch} branch"
+          elsif behind == 0
+            puts "It is #{ahead} commit#{"s" if ahead > 1} ahead of your local #{local_branch} branch"
+          else
+            puts "It is #{behind} commit#{"s" if behind > 1} behind and #{ahead} commit#{"s" if ahead > 1} ahead of your local #{local_branch} branch"
+          end
         end
-      end
-      case pending_migration_count
-      when 0
-        puts "There are no pending migrations"
-      when 1
-        puts "There is 1 pending migration"
       else
-        puts "There are #{pending_migration_count} pending migrations"
+        puts "Warning! The commit #{remote_commit.slice(0, 7)} is not present in the local repo. Why?"
       end
-      if pending_migration_count > 0
-        pending_migrations.each do |migration|
-          puts migration
+      if database_configured?
+        case pending_migration_count
+        when 0
+          puts "There are no pending migrations"
+        when 1
+          puts "There is 1 pending migration"
+        else
+          puts "There are #{pending_migration_count} pending migrations"
+        end
+        if pending_migration_count > 0
+          pending_migrations.each do |migration|
+            puts migration
+          end
         end
       end
     end

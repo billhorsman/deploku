@@ -15,5 +15,12 @@ module Deploku
       }
     end
 
+    def test_command(command)
+      Bundler.with_clean_env {
+        `#{command} 2> /dev/null`
+        $?.success?
+      }
+    end
+
   end
 end
