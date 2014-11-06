@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Bill Horsman"]
   spec.email         = ["bill@logicalcobwebs.com"]
   spec.summary       = %q{Convenient way of deploying to Heroku}
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/billhorsman/deploku"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0")
