@@ -37,13 +37,18 @@ module Deploku
         else
           puts "It is #{behind} commit#{"s" if behind > 1} behind and #{ahead} commit#{"s" if ahead > 1} ahead of your local #{local_branch} branch"
         end
-        case pending_migration_count
-        when 0
-          puts "There are no pending migrations"
-        when 1
-          puts "There is 1 pending migration"
-        else
-          puts "There are #{pending_migration_count} pending migrations"
+      end
+      case pending_migration_count
+      when 0
+        puts "There are no pending migrations"
+      when 1
+        puts "There is 1 pending migration"
+      else
+        puts "There are #{pending_migration_count} pending migrations"
+      end
+      if pending_migration_count > 0
+        pending_migrations.each do |migration|
+          puts migration
         end
       end
     end
@@ -110,12 +115,46 @@ module Deploku
       pending_migrations.size
     end
 
+    def migrations
+      local_migrations && remote_migrations # Triggers building of @migrations
+      @migrations.sort_by(&:version)
+    end
+
     def pending_migrations
-      @pending_migrations ||= if Dir['db/migrate'].any?
-        run_command("git diff #{remote_commit}.. --name-only db/migrate").split("\n")
+      migrations.select(&:pending?)
+    end
+
+    def add_migration(hash)
+      @migrations ||= []
+      migration = @migrations.detect {|m| m.version == hash[:version] } || Deploku::Migration.new(version: hash[:version])
+      if hash[:location] == :local
+        migration.local_status = hash[:status]
       else
-        []
+        migration.remote_status = hash[:status]
       end
+      @migrations << migration
+    end
+
+    def local_migrations
+      @local_migrations ||= extract_migrations(run_command("rake db:migrate:status"), :local)
+    end
+
+    def remote_migrations
+      @remote_migrations ||= extract_migrations(run_command("heroku run rake db:migrate:status --app #{app_name}"), :remote)
+    end
+
+    def extract_migrations(output, location)
+      output.split("\n").
+        select {|line|
+          line =~ /^\s*(up|down)/
+        }.map {|line|
+          values = line.split(" ")
+          add_migration(
+            location: location,
+            version: values[1],
+            status: values[0],
+          )
+        }
     end
 
   end
