@@ -32,7 +32,7 @@ module Deploku
     end
 
     def count_rev_list(range)
-      run_command("git rev-list #{range}").slice("\n").size
+      run_command("git rev-list #{range}").split("\n").size
     end
 
     def remote_commit
