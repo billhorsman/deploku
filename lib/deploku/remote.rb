@@ -106,14 +106,14 @@ module Deploku
 
     def deploy_commands
       return @deploy_commands if @deploy_commands
-      maintenance_mode = pending_migration_count > 0 && maintenance == :use
+      maintenance_mode = false
       list = []
-      if pending_migration_count > 0
+      if migration_required?
         case maintenance
         when :use
           maintenance_mode = true
         when :skip
-          maintenance_mode = false
+          # OK, nothing to do
         else
           puts "There are migrations to run. Please either choose maintenance or maintenance:skip"
           exit 1
@@ -121,10 +121,14 @@ module Deploku
       end
       list << "heroku maintenance:on --app #{app_name}" if maintenance_mode
       list << "git push#{force ? " --force" : ""} #{remote} #{local_branch}:master"
-      list << "heroku run rake db:migrate --app #{app_name}" if pending_migration_count > 0
-      list << "heroku restart --app #{app_name}" if pending_migration_count > 0
+      list << "heroku run rake db:migrate --app #{app_name}" if migration_required?
+      list << "heroku restart --app #{app_name}" if migration_required?
       list << "heroku maintenance:off --app #{app_name}" if maintenance_mode
       @deploy_commands = list
+    end
+
+    def migration_required?
+      database_configured? && pending_migration_count > 0
     end
 
     def local_branch
