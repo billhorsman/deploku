@@ -14,11 +14,13 @@ module Deploku
     end
 
     def remote_commit_exists_locally?
-      test_command("git show #{remote_commit}")
+      return @remote_commit_exists_locally if defined? @remote_commit_exists_locally
+      @remote_commit_exists_locally = test_command("git show #{remote_commit}")
     end
 
     def database_configured?
-      test_command("rake db:migrate:status")
+      return @database_configured if defined? @database_configured
+      @database_configured = test_command("rake db:migrate:status")
     end
 
     def behind
