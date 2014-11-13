@@ -14,7 +14,7 @@ module Deploku
         remote = matching_remotes[0]
         args.delete remote
         commands = %w[status deploy] & args
-        commands << "status" if commands.size == 0
+        commands << "deploy" if commands.size == 0
         if commands.size > 1
           puts "Choose just one command"
           exit 1
