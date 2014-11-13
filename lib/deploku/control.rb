@@ -5,7 +5,13 @@ module Deploku
 
     def self.run(args)
       matching_remotes = remotes & args
-      case matching_remotes.size
+      if matching_remotes.size == 0 && remote_index_uniq?
+        if key = (remote_index.keys & args)[0]
+          matching_remotes = [remote_index[key]]
+          args.delete key
+        end
+      end
+      case matching_remotes.compact.size
       when 0
         puts "#{remotes.size} Heroku remote#{'s' if remotes.size > 1} found:"
         puts *remotes
@@ -32,6 +38,14 @@ module Deploku
       @remotes ||= run_command("git remote -v | grep heroku | grep push").split("\n").map {|line|
         line.match(/^(.*)\t/)[1]
       }
+    end
+
+    def self.remote_index_uniq?
+      remote_index.size == remotes.size
+    end
+
+    def self.remote_index
+      @remote_index ||= Hash[remotes.map{|r| [r.slice(0, 1), r] }]
     end
 
   end

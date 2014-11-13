@@ -31,16 +31,16 @@ production
 staging
 ```
 
-Then choose a remote and run it again:
+Then choose a remote and run it again to find its `status`:
 
 ```
-[master]$ deploku production
+[master]$ deploku production status
 Heroku app my-app-production is running commit abcdef7
 It is 3 commits behind your local master branch
 There are no pending migrations
 ```
 
-If you want to deploy then add the `deploy` command:
+If you want to deploy then use the `deploy` command instead:
 
 ```
 [master]$ deploku production deploy
@@ -56,7 +56,7 @@ Proceed? (y/N):
 
 Enter `y` to proceed or anything else to abort. Nothing will happen unless you enter `y`.
 
-If there are migrations pending then you will be forced to either pass in either the `maintenance` or `maintenance:skip` options.
+If there are migrations pending then you will be forced to pass in either the `maintenance` or `maintenance:skip` options.
 
 ```
 [master]$ deploku production deploy maintenance
@@ -73,6 +73,12 @@ The following commands will be run:
 
 Proceed? (y/N):
 ```
+
+## Defaults
+
+The default command is `deploy` since that always prompts you before doing anything anyway.
+
+You can pick the remote just by choosing the first letter of the remote - as long as the initial letter for each remote is unique. For instance, if you have two remotes, `staging` and `production`, then you can just type `deploku s`.
 
 ## Contributing
 

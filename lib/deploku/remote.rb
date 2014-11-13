@@ -40,6 +40,7 @@ module Deploku
     end
 
     def status(args)
+      puts "Looking up current status for #{remote}"
       puts "Heroku app #{app_name} is running commit #{remote_commit.slice(0, 7)}"
       if remote_commit_exists_locally?
         if behind == 0 && ahead == 0
