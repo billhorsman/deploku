@@ -20,7 +20,7 @@ module Deploku
 
     def database_configured?
       return @database_configured if defined? @database_configured
-      @database_configured = test_command("rake db:migrate:status")
+      @database_configured = test_command("bundle exec rake db:migrate:status")
     end
 
     def behind
@@ -161,7 +161,7 @@ module Deploku
     end
 
     def local_migrations
-      @local_migrations ||= extract_migrations(run_command("rake db:migrate:status"), :local)
+      @local_migrations ||= extract_migrations(run_command("bundle exec rake db:migrate:status"), :local)
     end
 
     def remote_migrations
