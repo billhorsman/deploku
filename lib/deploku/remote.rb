@@ -91,17 +91,26 @@ module Deploku
       deploy_commands.each_with_index do |command, index|
         puts "  #{index + 1}. #{command}"
       end
-      print "\nProceed? (y/N): "
-      proceed = STDIN.gets.strip
-      if proceed == "y"
-        puts ""
-        deploy_commands.each_with_index do |command, index|
-          puts "  #{index + 1}. #{command} ..."
-          run_command command
+      repeat = true
+      while repeat
+        repeat = false
+        print "\nChoose:\nD = deploy, or\nL = list commits to deploy, or\nanything else to abort: "
+        proceed = STDIN.getch.upcase
+        puts proceed
+        if proceed == "D"
+          puts ""
+          deploy_commands.each_with_index do |command, index|
+            puts "  #{index + 1}. #{command} ..."
+            run_command command
+          end
+          puts
+        elsif proceed == "L"
+          puts "\nList of commits between #{remote_commit.slice(0, 7)} and local branch\n"
+          run_command "git log --oneline #{remote_commit}..", :echo
+          repeat = true
+        else
+          puts "Abort"
         end
-        puts
-      else
-        puts "Abort"
       end
     end
 

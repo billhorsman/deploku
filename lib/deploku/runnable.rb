@@ -1,10 +1,13 @@
 module Deploku
   module Runnable
 
-    def run_command(command)
+    def run_command(command, option = nil)
       Bundler.with_clean_env {
         out = `#{command}`
         if $?.success?
+          if option == :echo
+            puts out
+          end
           out
         else
           puts "Error running command:"
