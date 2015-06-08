@@ -10,7 +10,14 @@ module Deploku
     end
 
     def app_name
-      @app_name ||= run_command("git remote -v | grep #{remote} | grep push").match(/heroku[^:]*:(.*)\.git/)[1]
+      @app_name ||= begin
+        output = run_command("git remote -v | grep #{remote} | grep push")
+        if output =~ /git@/
+          output.match(/heroku[^:]*:(.*)\.git/)[1]
+        else
+          output.match(/\/\/[^\/]+\/(.*)\.git/)[1]
+        end
+      end
     end
 
     def remote_commit_exists_locally?
